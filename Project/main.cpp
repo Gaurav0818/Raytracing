@@ -12,6 +12,14 @@ color ray_color(const ray& r)
     return (1.0f - t) * color(1.0f) + t * color(0.5f, 0.7f, 1.0f);      // lerp ---- blendedValue = (1−t).startValue + t.endValue
 }
 
+color ray_color(const ray& r, color col)
+{
+    vec3 unit_direction = unit_vector(r.direction());
+
+    const float t = 0.5f*(unit_direction.y() + 1.0f);
+    return (1.0f - t) * color(1.0f) + t * col;      // lerp ---- blendedValue = (1−t).startValue + t.endValue
+}
+
 int main() {
 
     // Image
