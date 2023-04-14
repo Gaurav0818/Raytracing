@@ -1,34 +1,20 @@
-#include <iostream>
+#include "CommonUtility.h"
 
 #include "script/color.h"
-#include "script/ray.h"
-#include "script/vec3.h"
+#include "script/hittable_list.h"
+#include "script/sphere.h"
 
-float hit_sphere(const point3& center, float radius, const ray& r)
-{
-    vec3 oc = r.origin() - center;
-    auto a = r.direction().length_squared();
-    auto half_b = dot(oc, r.direction());
-    auto c = oc.length_squared() - radius * radius;
-    auto discriminant = half_b*half_b - a*c;
-    
-    if(discriminant < 0)
-        return -1.0;
-    
-    return (-half_b - sqrt(discriminant) ) / a;
-}
 
-color ray_color(const ray& r)
+color ray_color(const ray& r, const hittable& world)
 {
-    auto t = hit_sphere(point3(0, 0, -1), 0.5, r);
-    if( t > 0.0f)
-    {
-        vec3 N = unit_vector(r.at(t) - vec3(0,0,-1));
-        return 0.5*color(N.x()+1, N.y()+1, N.z()+1);
-    }
+    hit_record rec;
+	if(world.hit(r, 0, infinity, rec))
+	{
+        return 0.5 * (rec.normal + color(1));
+	}
     
     vec3 unit_direction = unit_vector(r.direction());
-    t = 0.5f*(unit_direction.y() + 1.0f);
+    auto t = 0.5f*(unit_direction.y() + 1.0f);
     return (1.0f - t) * color(1.0f) + t * color(0.5f, 0.7f, 1.0f);      // lerp ---- blendedValue = (1−t).startValue + t.endValue
 }
 
@@ -46,6 +32,11 @@ int main() {
     const auto aspect_ratio = 16.0f / 9.0f;
     const auto image_width = 400.0f;
     const auto image_height = image_width/aspect_ratio;
+
+    // World
+    hittable_list world;
+    world.add(std::make_shared<sphere>(point3(0, 0, -1), 0.5));
+    world.add(std::make_shared<sphere>(point3(0, -100.5, -1), 100));
 
     // Camera
     auto viewport_height = 2.0f;
@@ -66,7 +57,7 @@ int main() {
             auto u = i / (image_width-1);
             auto v = j / (image_height-1);
             ray r(origin, lower_left_corner + u * horizontal + v * vertical - origin);
-            color pixel_color = ray_color(r);
+            color pixel_color = ray_color(r, world);
             write_color(std::cout, pixel_color);
         }
     }
