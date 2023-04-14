@@ -130,8 +130,12 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CommonUtility.h" />
     <ClInclude Include="script\color.h" />
+    <ClInclude Include="script\hittable.h" />
+    <ClInclude Include="script\hittable_list.h" />
     <ClInclude Include="script\ray.h" />
+    <ClInclude Include="script\sphere.h" />
     <ClInclude Include="script\vec3.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
